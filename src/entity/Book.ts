@@ -1,14 +1,14 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
 import { BorrowedBook } from './BarrowedBook';
-import { BookRating } from './BookRating';
 
 @Entity({ name: 'books' })
 export class Book {
-    @PrimaryGeneratedColumn("uuid")
+    // NOTE : should use uuid @PrimaryGeneratedColumn("uuid")
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ length: 255 })
-    title: string;
+    name: string;
 
     @Column('decimal', { precision: 3, scale: 2, default: 0.00 })
     averageRating: number;
@@ -18,7 +18,4 @@ export class Book {
 
     @OneToMany(() => BorrowedBook, borrowedBook => borrowedBook.book)
     borrowedBooks: BorrowedBook[];
-
-    @OneToMany(() => BookRating, bookRating => bookRating.book)
-    bookRatings: BookRating[];
 }
