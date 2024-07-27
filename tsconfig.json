@@ -8,9 +8,24 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
-    "baseUrl": "./",
+    "baseUrl": "./" /* Specify the base directory to resolve non-relative module names. */,
     "paths": {
-      "@/app/*": ["src/*"]
-    }
-  }
+      "@/app/*": [
+        "./src/*"
+      ] /* Specify a set of entries that re-map imports to additional lookup locations. */
+    } /* Specify a set of entries that re-map imports to additional lookup locations. */,
+    "plugins": [
+      /* Transform paths in output .js files */
+      {
+        "transform": "typescript-transform-paths"
+      },
+      /* Transform paths in output .d.ts files */
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "build"]
 }
