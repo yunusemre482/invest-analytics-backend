@@ -1,16 +1,15 @@
-import { NextFunction, Request, response, Response } from "express";
-import { ApiError } from "./errors";
-import { ZodError } from "zod";
+import { Request, Response, NextFunction } from 'express';
 
-export const errorMiddleware = (
-    error: Error & Partial<ApiError> & Partial<ZodError>,
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
 
-    const statusCode = error.statusCode ?? 500
-    const message = error.statusCode ? error.message : 'Internal Server Error';
-
-    return res.status(statusCode).json({ message });
+    res.status(statusCode).json({
+        statusCode,
+        message,
+        timestamp: new Date().toISOString(),
+        path: req.originalUrl,
+    });
 }
+
+export default errorHandler;

@@ -8,10 +8,21 @@ dotenv.config({
 
 import { AppDataSource } from "./data-source";
 import * as express from "express";
-import { errorMiddleware } from "./middlewares/error.middleware";
+
 import UserRoutes from "./routes/user.router";
 import BookRoutes from "./routes/book.router";
+import errorHandler from "./middlewares/error.middleware";
 
+
+
+AppDataSource.initialize()
+    .then(async () => {
+        app.listen(PORT, () => {
+            console.log("Server is running on http://localhost:" + PORT);
+        });
+        console.log("Data Source has been initialized!");
+    })
+    .catch((error) => console.log(error));
 
 const app = express();
 
@@ -23,17 +34,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const { PORT = 3000 } = process.env;
 
-app.use(errorMiddleware);
-
 app.use("/users", UserRoutes);
 app.use("/books", BookRoutes);
 
-
-AppDataSource.initialize()
-    .then(async () => {
-        app.listen(PORT, () => {
-            console.log("Server is running on http://localhost:" + PORT);
-        });
-        console.log("Data Source has been initialized!");
-    })
-    .catch((error) => console.log(error));
+app.use(errorHandler);

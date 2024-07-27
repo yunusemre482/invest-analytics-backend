@@ -1,9 +1,9 @@
-import { DeleteResult, Repository } from "typeorm";
+import { DeleteResult, IsNull, LessThan, Not, Or, Repository } from "typeorm";
 import { Book } from "../entity/Book";
 import { AppDataSource } from "../data-source";
 import { PaginationAndFilter } from "../validations/pagination-and-filter.validation";
 import { BorrowedBook } from "../entity/BarrowedBook";
-import { BadRequestError, NotFoundError } from "../middlewares/errors";
+import { NotFoundError } from "../middlewares/errors";
 
 
 export class BookService {
@@ -13,7 +13,6 @@ export class BookService {
     constructor() {
         this.bookRepository = AppDataSource.getRepository(Book);
         this.borrowedBookRepository = AppDataSource.getRepository(BorrowedBook);
-        console.log("BookService created");
     }
 
     async findAll(query: PaginationAndFilter): Promise<[Book[], number]> {
@@ -46,7 +45,7 @@ export class BookService {
         });
 
         if (!BookToUpdate) {
-            throw new NotFoundError('Book not found');
+            throw new Error('Book not found');
         }
 
         return this.bookRepository.merge(BookToUpdate, Book);
@@ -91,12 +90,13 @@ export class BookService {
             where: {
                 userId: userId,
                 bookId: bookId,
-                returnedAt: null
+                borrowedAt: LessThan(new Date()),
+                returnedAt: IsNull()
             }
         });
 
         if (!borrowedBook) {
-            throw new BadRequestError('Book not borrowed');
+            throw new NotFoundError('Book not borrowed');
         }
 
         borrowedBook.returnedAt = new Date();
@@ -104,13 +104,12 @@ export class BookService {
         return await this.borrowedBookRepository.save(borrowedBook);
     }
 
+
     async isBookAvailable(bookId: number): Promise<boolean> {
         const borrowedBook = await this.borrowedBookRepository.findOne({
             where: {
-                book: {
-                    id: bookId
-                },
-                returnedAt: null
+                bookId: bookId,
+                returnedAt: IsNull()
             }
         });
 

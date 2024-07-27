@@ -114,7 +114,7 @@ export class UserController {
             }
 
             // STEP 3: check book is available or not
-            const isAvailable = await this.bookService.isBookAvailable(bookId);
+            const isAvailable = await this.bookService.isBookAvailable( bookId);
 
             if (!isAvailable) {
                 res.status(400).json({ message: "Book is not available" });
@@ -163,6 +163,8 @@ export class UserController {
             }
 
         } catch (error) {
+
+            console.log(error);
             next(error);
         }
     }

@@ -23,8 +23,8 @@ export class BorrowedBook {
     @ManyToOne(() => Book, book => book.borrowedBooks)
     @JoinColumn({ name: 'bookId' })
     book: Book;
-    
-    @CreateDateColumn()
+
+    @Column({ type: 'timestamp', nullable: true })
     borrowedAt: Date;
 
     @Column({ type: 'timestamp', nullable: true })
