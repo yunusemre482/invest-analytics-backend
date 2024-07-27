@@ -8,23 +8,26 @@ dotenv.config({
 
 import { AppDataSource } from "./data-source";
 import * as express from "express";
-import { Request, Response } from "express";
-import { errorHandler } from "./middlewares/error.middleware";
-
+import { errorMiddleware } from "./middlewares/error.middleware";
+import UserRoutes from "./routes/user.router";
+import BookRoutes from "./routes/book.router";
 
 
 const app = express();
 
 // Initialize the the middlewares
 app.use(express.json());
-app.use(errorHandler);
+app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 
 const { PORT = 3000 } = process.env;
 
+app.use(errorMiddleware);
 
-app.get("*", (req: Request, res: Response) => {
-    res.status(505).json({ message: "Bad Request" });
-});
+app.use("/users", UserRoutes);
+app.use("/books", BookRoutes);
+
 
 AppDataSource.initialize()
     .then(async () => {
